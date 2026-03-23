@@ -48,7 +48,10 @@ const preprocess = (data) => {
     const { date, dong, type, value } = item;
 
     // 날짜 포맷 변환 (YYYY-MM-DD)
-    const formattedDate = `${date.slice(0, 4)}-${date.slice(4, 6)}-${date.slice(6, 8)}`;
+    const formattedDate = `${date.slice(0, 4)}-${date.slice(4, 6)}-${date.slice(
+      6,
+      8
+    )}`;
 
     const key = `${dong}-${formattedDate}`;
 
@@ -101,6 +104,7 @@ const preprocess = (data) => {
 
 const Dashboard = () => {
   const [visitorData, setVisitorData] = useState({}); // 일별 방문자수 데이터 저장 변수
+  const [selectedDong, setSelectedDong] = useState("동명동"); // 선택된 행정동 저장 변수
 
   /* "날짜_행정동_방문자 수 추이.csv" 데이터를 하나의 JS배열로 만들어 visitorData에 저장 */
   useEffect(() => {
@@ -111,8 +115,8 @@ const Dashboard = () => {
             throw new Error(`${file} 로드 실패`);
           }
           return res.text();
-        }),
-      ),
+        })
+      )
     ).then((texts) => {
       const allData = texts.flatMap((text) => parseCSV(text));
 
@@ -122,7 +126,25 @@ const Dashboard = () => {
     });
   }, []);
 
-  return <div>Dashboard</div>;
+  const selectedData = visitorData[selectedDong]; // 선택된 행정동의 데이터
+
+  return (
+    <div className="Dashboard">
+      <div>
+        <select
+          value={selectedDong}
+          onChange={(e) => setSelectedDong(e.target.value)}
+        >
+          {Object.keys(visitorData).map((dong) => (
+            <option key={dong} value={dong}>
+              {dong}
+            </option>
+          ))}
+        </select>
+      </div>
+      <pre>{JSON.stringify(selectedData, null, 2)}</pre>
+    </div>
+  );
 };
 
 export default Dashboard;
