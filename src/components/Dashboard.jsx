@@ -3,6 +3,16 @@ import "./Dashboard.css";
 import { visitorFiles } from "../data/visitorFiles";
 
 import { useEffect, useState } from "react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  BarChart,
+  Bar,
+} from "recharts";
 
 // CSV 문자열 -> JS 객체 배열로 변환
 const parseCSV = (text) => {
@@ -105,6 +115,8 @@ const preprocess = (data) => {
 const Dashboard = () => {
   const [visitorData, setVisitorData] = useState({}); // 일별 방문자수 데이터 저장 변수
   const [selectedDong, setSelectedDong] = useState("동명동"); // 선택된 행정동 저장 변수
+  const [selectedYear, setSelectedYear] = useState("2025"); // 선택된 년도 저장 변수
+  const [selectedMonth, setSelectedMonth] = useState("01"); // 선택된 월 저장 변수
 
   /* "날짜_행정동_방문자 수 추이.csv" 데이터를 하나의 JS배열로 만들어 visitorData에 저장 */
   useEffect(() => {
@@ -128,9 +140,35 @@ const Dashboard = () => {
 
   const selectedData = visitorData[selectedDong]; // 선택된 행정동의 데이터
 
+  // 년도, 월 기준 필터링
+  const filteredRawData = selectedData?.filter((item) => {
+    const year = item.date.slice(0, 4);
+    const month = item.date.slice(5, 7);
+
+    return year === selectedYear && month === selectedMonth;
+  });
+
+  /* 일별 방문자수 diff / rate 계산 */
+  const trendData = filteredRawData?.map((item, index, arr) => {
+    if (index === 0) {
+      return { ...item, diff: 0, rate: 0 };
+    }
+
+    const prev = arr[index - 1];
+    const diff = item.total - prev.total;
+    const rate = prev.total ? diff / prev.total : 0;
+
+    return {
+      ...item,
+      diff,
+      rate,
+    };
+  });
+
   return (
     <div className="Dashboard">
       <div>
+        {/* 행정동 선택 dropdown */}
         <select
           value={selectedDong}
           onChange={(e) => setSelectedDong(e.target.value)}
@@ -141,6 +179,59 @@ const Dashboard = () => {
             </option>
           ))}
         </select>
+        {/* 년도 선택 dropdown */}
+        <select
+          value={selectedYear}
+          onChange={(e) => setSelectedYear(e.target.value)}
+        >
+          {["2025", "2026"].map((y) => (
+            <option key={y} value={y}>
+              {y}년
+            </option>
+          ))}
+        </select>
+        {/* 월 선택 dropdown */}
+        <select
+          value={selectedMonth}
+          onChange={(e) => setSelectedMonth(e.target.value)}
+        >
+          {[
+            "01",
+            "02",
+            "03",
+            "04",
+            "05",
+            "06",
+            "07",
+            "08",
+            "09",
+            "10",
+            "11",
+            "12",
+          ].map((m) => (
+            <option key={m} value={m}>
+              {m}월
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="Chart1">
+        {/* LineChart (추세) */}
+        <LineChart width={700} height={300} data={trendData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="date" />
+          <YAxis />
+          <Tooltip />
+          <Line type="monotone" dataKey="total" />
+        </LineChart>
+        {/* BarChart (증가/감소) */}
+        <BarChart width={700} height={300} data={trendData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="date" />
+          <YAxis />
+          <Tooltip />
+          <Bar dataKey="diff" />
+        </BarChart>
       </div>
       <pre>{JSON.stringify(selectedData, null, 2)}</pre>
     </div>
