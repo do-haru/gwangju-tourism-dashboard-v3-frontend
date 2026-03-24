@@ -307,6 +307,39 @@ const Dashboard = () => {
     };
   })();
 
+  /*  요일별 외지인 / 현지인 */
+  const dayOfWeekVisitorData = (() => {
+    if (!filteredRawData || filteredRawData.length === 0) return [];
+
+    const grouped = {};
+
+    filteredRawData.forEach((item) => {
+      if (!grouped[item.day]) {
+        grouped[item.day] = {
+          visitorSum: 0,
+          residentSum: 0,
+          count: 0,
+        };
+      }
+
+      grouped[item.day].visitorSum += item.visitor;
+      grouped[item.day].residentSum += item.resident;
+      grouped[item.day].count += 1;
+    });
+
+    const order = ["일", "월", "화", "수", "목", "금", "토"];
+
+    return order.map((day) => ({
+      day,
+      visitor: grouped[day]
+        ? Math.round(grouped[day].visitorSum / grouped[day].count)
+        : 0,
+      resident: grouped[day]
+        ? Math.round(grouped[day].residentSum / grouped[day].count)
+        : 0,
+    }));
+  })();
+
   return (
     <div className="Dashboard">
       <div>
@@ -465,6 +498,20 @@ const Dashboard = () => {
           <YAxis />
           <Tooltip />
           <Bar dataKey="avg" name="평균 방문자" />
+        </BarChart>
+
+        {/* ⭐ 요일별 외지인 / 현지인 BarChart */}
+        <BarChart width={700} height={300} data={dayOfWeekVisitorData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="day" />
+          <YAxis />
+          <Tooltip />
+
+          {/* ⭐ 외지인 */}
+          <Bar dataKey="visitor" stackId="a" fill="#ff7f50" name="외지인" />
+
+          {/* ⭐ 현지인 */}
+          <Bar dataKey="resident" stackId="a" fill="#1e90ff" name="현지인" />
         </BarChart>
 
         {/* 요일 분석 */}
