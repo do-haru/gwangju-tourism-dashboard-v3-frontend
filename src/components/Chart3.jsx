@@ -2,7 +2,12 @@ import "./Chart3.css";
 
 import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 
-const Chart3 = ({ dayOfWeekData, dayOfWeekVisitorData, dayOfWeekAnalysis }) => {
+const Chart3 = ({
+  dayOfWeekData,
+  dayOfWeekVisitorData,
+  dayOfWeekAnalysis,
+  dayRanking,
+}) => {
   return (
     <div className="Chart3">
       {/* 요일별 평균 방문자 BarChart */}
@@ -45,6 +50,17 @@ const Chart3 = ({ dayOfWeekData, dayOfWeekVisitorData, dayOfWeekAnalysis }) => {
           <p>
             평일 평균 방문자: {dayOfWeekAnalysis.weekdayAvg.toLocaleString()}명
           </p>
+        </div>
+      )}
+      {/* 요일별 방문자 순위 */}
+      {dayRanking && dayRanking.length > 0 && (
+        <div className="day-ranking">
+          <h4>요일별 방문자 순위</h4>
+          {dayRanking.map((item) => (
+            <p key={item.day}>
+              {item.rank}위: {item.day} ({item.avg.toLocaleString()}명)
+            </p>
+          ))}
         </div>
       )}
     </div>

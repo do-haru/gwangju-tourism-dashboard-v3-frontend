@@ -343,6 +343,18 @@ const Dashboard = () => {
     }));
   })();
 
+  /* 요일별 방문자 순위 */
+  const dayRanking = (() => {
+    if (!dayOfWeekData || dayOfWeekData.length === 0) return [];
+
+    return [...dayOfWeekData]
+      .sort((a, b) => b.avg - a.avg)
+      .map((item, index) => ({
+        ...item,
+        rank: index + 1,
+      }));
+  })();
+
   return (
     <div className="Dashboard">
       <div>
@@ -406,6 +418,7 @@ const Dashboard = () => {
         dayOfWeekData={dayOfWeekData}
         dayOfWeekVisitorData={dayOfWeekVisitorData}
         dayOfWeekAnalysis={dayOfWeekAnalysis}
+        dayRanking={dayRanking}
       />
       <pre>{JSON.stringify(selectedData, null, 2)}</pre>
     </div>
