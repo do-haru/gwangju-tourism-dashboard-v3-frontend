@@ -1,0 +1,50 @@
+.Chart2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 24px;
+
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.Chart2_1,
+.Chart2_2,
+.Chart2_3 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ratio-toggle button {
+  padding: 6px 12px;
+  border: none;
+  background: #e5e7eb;
+  cursor: pointer;
+  color: #374151;
+}
+
+.ratio-toggle button.active.visitor {
+  background: #ff7f50;
+  color: white;
+}
+
+.ratio-toggle button.active.resident {
+  background: #1e90ff;
+  color: white;
+}
+
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* ⭐ 3개씩 */
+  gap: 16px;
+  height: 400px;
+}
+
+.Chart2_4 .chart-desc {
+  text-align: left;
+  align-self: flex-start;
+  margin-left: 0px;
+}

@@ -238,6 +238,26 @@ const Dashboard = () => {
     };
   })();
 
+  /* 현지인 최대 / 평균 */
+  const residentSummary = (() => {
+    if (!filteredRawData || filteredRawData.length === 0) return null;
+
+    let maxItem = filteredRawData[0];
+    let sum = 0;
+
+    filteredRawData.forEach((item) => {
+      if (item.resident > maxItem.resident) maxItem = item;
+      sum += item.resident;
+    });
+
+    const avg = sum / filteredRawData.length;
+
+    return {
+      maxItem,
+      avg,
+    };
+  })();
+
   /* 평균 외지인 비율 */
   const avgVisitorRatio = (() => {
     if (!filteredRawData || filteredRawData.length === 0) return 0;
@@ -426,14 +446,15 @@ const Dashboard = () => {
         visitorConcentration={visitorConcentration}
         COLORS={COLORS}
         avgVisitorRatio={avgVisitorRatio}
+        residentSummary={residentSummary}
       />
-
-      <Chart3
+      {/*<Chart3
         dayOfWeekData={dayOfWeekData}
         dayOfWeekVisitorData={dayOfWeekVisitorData}
         dayOfWeekAnalysis={dayOfWeekAnalysis}
         dayRanking={dayRanking}
-      />
+      />*/}
+
       <pre>{JSON.stringify(selectedData, null, 2)}</pre>
     </div>
   );
