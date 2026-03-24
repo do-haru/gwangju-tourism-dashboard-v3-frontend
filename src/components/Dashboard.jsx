@@ -234,6 +234,79 @@ const Dashboard = () => {
     };
   })();
 
+  /* 요일별 평균 방문자 */
+  const dayOfWeekData = (() => {
+    if (!filteredRawData || filteredRawData.length === 0) return [];
+
+    const grouped = {};
+
+    filteredRawData.forEach((item) => {
+      if (!grouped[item.day]) {
+        grouped[item.day] = { sum: 0, count: 0 };
+      }
+
+      grouped[item.day].sum += item.total;
+      grouped[item.day].count += 1;
+    });
+
+    const order = ["일", "월", "화", "수", "목", "금", "토"];
+
+    return order.map((day) => ({
+      day,
+      avg: grouped[day] ? Math.round(grouped[day].sum / grouped[day].count) : 0,
+    }));
+  })();
+
+  /* 요일별 평균 방문자 + 최대/최소 + 주말/평일 */
+  const dayOfWeekAnalysis = (() => {
+    if (!filteredRawData || filteredRawData.length === 0) return null;
+
+    const grouped = {};
+
+    filteredRawData.forEach((item) => {
+      if (!grouped[item.day]) {
+        grouped[item.day] = { sum: 0, count: 0 };
+      }
+
+      grouped[item.day].sum += item.total;
+      grouped[item.day].count += 1;
+    });
+
+    const order = ["일", "월", "화", "수", "목", "금", "토"];
+
+    const avgData = order.map((day) => ({
+      day,
+      avg: grouped[day] ? Math.round(grouped[day].sum / grouped[day].count) : 0,
+    }));
+
+    // 최대 / 최소 요일
+    let maxDay = avgData[0];
+    let minDay = avgData[0];
+
+    avgData.forEach((item) => {
+      if (item.avg > maxDay.avg) maxDay = item;
+      if (item.avg < minDay.avg) minDay = item;
+    });
+
+    // 주말 vs 평일
+    const weekend = avgData.filter((d) => d.day === "토" || d.day === "일");
+    const weekday = avgData.filter((d) => !["토", "일"].includes(d.day));
+
+    const weekendAvg =
+      weekend.reduce((sum, d) => sum + d.avg, 0) / weekend.length;
+
+    const weekdayAvg =
+      weekday.reduce((sum, d) => sum + d.avg, 0) / weekday.length;
+
+    return {
+      avgData,
+      maxDay,
+      minDay,
+      weekendAvg: Math.round(weekendAvg),
+      weekdayAvg: Math.round(weekdayAvg),
+    };
+  })();
+
   return (
     <div className="Dashboard">
       <div>
@@ -376,8 +449,6 @@ const Dashboard = () => {
             <p>
               외지인 집중도: {visitorConcentration.concentration.toFixed(2)}
             </p>
-
-            {/* ⭐ 설명 추가 */}
             <p>
               ※ 외지인 집중도는 특정 날짜에 외지인 방문이 얼마나 몰려 있는지를
               나타내며, 값이 높을수록 외지인 방문이 특정 시점에 집중되는 경향을
@@ -386,7 +457,38 @@ const Dashboard = () => {
           </div>
         )}
       </div>
+      <div className="Chart3">
+        {/* 요일별 평균 방문자 BarChart */}
+        <BarChart width={700} height={300} data={dayOfWeekData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="day" />
+          <YAxis />
+          <Tooltip />
+          <Bar dataKey="avg" name="평균 방문자" />
+        </BarChart>
 
+        {/* 요일 분석 */}
+        {dayOfWeekAnalysis && (
+          <div className="day-summary">
+            <p>
+              최대 방문 요일: {dayOfWeekAnalysis.maxDay.day} (
+              {dayOfWeekAnalysis.maxDay.avg.toLocaleString()}명)
+            </p>
+            <p>
+              최소 방문 요일: {dayOfWeekAnalysis.minDay.day} (
+              {dayOfWeekAnalysis.minDay.avg.toLocaleString()}명)
+            </p>
+            <p>
+              주말 평균 방문자: {dayOfWeekAnalysis.weekendAvg.toLocaleString()}
+              명
+            </p>
+            <p>
+              평일 평균 방문자: {dayOfWeekAnalysis.weekdayAvg.toLocaleString()}
+              명
+            </p>
+          </div>
+        )}
+      </div>
       <pre>{JSON.stringify(selectedData, null, 2)}</pre>
     </div>
   );
