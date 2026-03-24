@@ -104,6 +104,7 @@ const preprocess = (data) => {
     const newItem = {
       ...item,
       visitorRatio: item.total ? item.visitor / item.total : 0,
+      residentRatio: item.total ? item.resident / item.total : 0,
       day: days[dayIndex],
       dayIndex,
     };
@@ -235,6 +236,18 @@ const Dashboard = () => {
       avg,
       concentration,
     };
+  })();
+
+  /* 평균 외지인 비율 */
+  const avgVisitorRatio = (() => {
+    if (!filteredRawData || filteredRawData.length === 0) return 0;
+
+    const sum = filteredRawData.reduce(
+      (acc, item) => acc + item.visitorRatio,
+      0,
+    );
+
+    return sum / filteredRawData.length;
   })();
 
   /* 요일별 평균 방문자 */
@@ -412,6 +425,7 @@ const Dashboard = () => {
         pieData={pieData}
         visitorConcentration={visitorConcentration}
         COLORS={COLORS}
+        avgVisitorRatio={avgVisitorRatio}
       />
 
       <Chart3
