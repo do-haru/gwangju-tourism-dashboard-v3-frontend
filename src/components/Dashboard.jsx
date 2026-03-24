@@ -60,7 +60,7 @@ const preprocess = (data) => {
     // 날짜 포맷 변환 (YYYY-MM-DD)
     const formattedDate = `${date.slice(0, 4)}-${date.slice(4, 6)}-${date.slice(
       6,
-      8
+      8,
     )}`;
 
     const key = `${dong}-${formattedDate}`;
@@ -127,8 +127,8 @@ const Dashboard = () => {
             throw new Error(`${file} 로드 실패`);
           }
           return res.text();
-        })
-      )
+        }),
+      ),
     ).then((texts) => {
       const allData = texts.flatMap((text) => parseCSV(text));
 
@@ -164,6 +164,29 @@ const Dashboard = () => {
       rate,
     };
   });
+
+  /* 요약 지표 계산 */
+  const summary = (() => {
+    if (!filteredRawData || filteredRawData.length === 0) return null;
+
+    let max = filteredRawData[0];
+    let min = filteredRawData[0];
+    let sum = 0;
+
+    filteredRawData.forEach((item) => {
+      if (item.total > max.total) max = item;
+      if (item.total < min.total) min = item;
+      sum += item.total;
+    });
+
+    const avg = Math.round(sum / filteredRawData.length);
+
+    return {
+      max,
+      min,
+      avg,
+    };
+  })();
 
   return (
     <div className="Dashboard">
@@ -232,6 +255,20 @@ const Dashboard = () => {
           <Tooltip />
           <Bar dataKey="diff" />
         </BarChart>
+        {/* 요약 지표 UI */}
+        {summary && (
+          <div className="summary">
+            <p>
+              최대 방문일: {summary.max.date} (
+              {summary.max.total.toLocaleString()}명)
+            </p>
+            <p>
+              최소 방문일: {summary.min.date} (
+              {summary.min.total.toLocaleString()}명)
+            </p>
+            <p>평균 방문자: {summary.avg.toLocaleString()}명</p>
+          </div>
+        )}
       </div>
       <pre>{JSON.stringify(selectedData, null, 2)}</pre>
     </div>
