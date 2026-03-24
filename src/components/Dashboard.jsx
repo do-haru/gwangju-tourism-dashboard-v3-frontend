@@ -12,6 +12,9 @@ import {
   CartesianGrid,
   BarChart,
   Bar,
+  PieChart,
+  Pie,
+  Cell,
 } from "recharts";
 
 // CSV 문자열 -> JS 객체 배열로 변환
@@ -188,6 +191,27 @@ const Dashboard = () => {
     };
   })();
 
+  /* PieChart용 데이터 (평균 비율 기반) */
+  const pieData = (() => {
+    if (!filteredRawData || filteredRawData.length === 0) return [];
+
+    let visitorSum = 0;
+    let residentSum = 0;
+
+    filteredRawData.forEach((item) => {
+      visitorSum += item.visitor;
+      residentSum += item.resident;
+    });
+
+    return [
+      { name: "외지인", value: visitorSum },
+      { name: "현지인", value: residentSum },
+    ];
+  })();
+
+  /* PieChart 색상 */
+  const COLORS = ["#ff7f50", "#87cefa"];
+
   return (
     <div className="Dashboard">
       <div>
@@ -255,7 +279,7 @@ const Dashboard = () => {
           <Tooltip />
           <Bar dataKey="diff" />
         </BarChart>
-        {/* 요약 지표 UI */}
+        {/* 방문자수 최대, 최소, 평균 지표 */}
         {summary && (
           <div className="summary">
             <p>
@@ -269,6 +293,51 @@ const Dashboard = () => {
             <p>평균 방문자: {summary.avg.toLocaleString()}명</p>
           </div>
         )}
+      </div>
+      <div className="Chart2">
+        {/* 외지인/현지인 LineChart */}
+        <LineChart width={700} height={300} data={filteredRawData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="date" />
+          <YAxis />
+          <Tooltip />
+
+          {/* 외지인 */}
+          <Line
+            type="monotone"
+            dataKey="visitor"
+            name="외지인"
+            stroke="#ff7f50"
+            strokeWidth={2}
+          />
+
+          {/* 현지인 */}
+          <Line
+            type="monotone"
+            dataKey="resident"
+            name="현지인"
+            stroke="#1e90ff"
+            strokeWidth={2}
+          />
+        </LineChart>
+
+        {/* 외지인/현지인 비율 PieChart */}
+        <PieChart width={400} height={300}>
+          <Pie
+            data={pieData}
+            dataKey="value"
+            nameKey="name"
+            cx="50%"
+            cy="50%"
+            outerRadius={100}
+            label
+          >
+            {pieData.map((entry, index) => (
+              <Cell key={index} fill={COLORS[index % COLORS.length]} />
+            ))}
+          </Pie>
+          <Tooltip formatter={(v) => v.toLocaleString()} />
+        </PieChart>
       </div>
       <pre>{JSON.stringify(selectedData, null, 2)}</pre>
     </div>
