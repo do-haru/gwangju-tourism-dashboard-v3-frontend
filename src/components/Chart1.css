@@ -1,0 +1,64 @@
+.Chart1 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 24px;
+
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.Chart1_1,
+.Chart1_2 {
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+}
+
+.Chart1_3 {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+}
+
+.summary-card {
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 12px;
+  min-width: 140px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.chart-desc {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 10px;
+  text-align: left;
+  align-self: flex-start;
+  margin-left: 50px;
+}
+
+.summary-card .label {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 6px;
+}
+
+.summary-card .value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.summary-card .sub {
+  font-size: 13px;
+  color: #374151;
+}
