@@ -16,6 +16,9 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import Chart1 from "./Chart1";
+import Chart2 from "./Chart2";
+import Chart3 from "./Chart3";
 
 // CSV 문자열 -> JS 객체 배열로 변환
 const parseCSV = (text) => {
@@ -390,152 +393,20 @@ const Dashboard = () => {
           ))}
         </select>
       </div>
-      <div className="Chart1">
-        {/* LineChart (추세) */}
-        <LineChart width={700} height={300} data={trendData}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" />
-          <YAxis />
-          <Tooltip />
-          <Line type="monotone" dataKey="total" />
-        </LineChart>
-        {/* BarChart (증가/감소) */}
-        <BarChart width={700} height={300} data={trendData}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" />
-          <YAxis />
-          <Tooltip />
-          <Bar dataKey="diff" />
-        </BarChart>
-        {/* 방문자수 최대, 최소, 평균 지표 */}
-        {summary && (
-          <div className="summary">
-            <p>
-              최대 방문일: {summary.max.date} (
-              {summary.max.total.toLocaleString()}명)
-            </p>
-            <p>
-              최소 방문일: {summary.min.date} (
-              {summary.min.total.toLocaleString()}명)
-            </p>
-            <p>평균 방문자: {summary.avg.toLocaleString()}명</p>
-          </div>
-        )}
-      </div>
-      <div className="Chart2">
-        {/* 외지인/현지인 LineChart */}
-        <LineChart width={700} height={300} data={filteredRawData}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" />
-          <YAxis />
-          <Tooltip />
+      <Chart1 trendData={trendData} summary={summary} />
 
-          {/* 외지인 */}
-          <Line
-            type="monotone"
-            dataKey="visitor"
-            name="외지인"
-            stroke="#ff7f50"
-            strokeWidth={2}
-          />
+      <Chart2
+        filteredRawData={filteredRawData}
+        pieData={pieData}
+        visitorConcentration={visitorConcentration}
+        COLORS={COLORS}
+      />
 
-          {/* 현지인 */}
-          <Line
-            type="monotone"
-            dataKey="resident"
-            name="현지인"
-            stroke="#1e90ff"
-            strokeWidth={2}
-          />
-        </LineChart>
-
-        {/* 외지인/현지인 비율 PieChart */}
-        <PieChart width={400} height={300}>
-          <Pie
-            data={pieData}
-            dataKey="value"
-            nameKey="name"
-            cx="50%"
-            cy="50%"
-            outerRadius={100}
-            label
-          >
-            {pieData.map((entry, index) => (
-              <Cell key={index} fill={COLORS[index % COLORS.length]} />
-            ))}
-          </Pie>
-          <Tooltip formatter={(v) => v.toLocaleString()} />
-        </PieChart>
-        {/* 외지인/현지인 요약 지표 */}
-        {visitorConcentration && (
-          <div className="concentration">
-            <p>
-              최대 외지인 방문일: {visitorConcentration.maxItem.date} (
-              {visitorConcentration.maxItem.visitor.toLocaleString()}명)
-            </p>
-
-            <p>
-              평균 외지인 방문자:{" "}
-              {Math.round(visitorConcentration.avg).toLocaleString()}명
-            </p>
-
-            <p>
-              외지인 집중도: {visitorConcentration.concentration.toFixed(2)}
-            </p>
-            <p>
-              ※ 외지인 집중도는 특정 날짜에 외지인 방문이 얼마나 몰려 있는지를
-              나타내며, 값이 높을수록 외지인 방문이 특정 시점에 집중되는 경향을
-              의미함
-            </p>
-          </div>
-        )}
-      </div>
-      <div className="Chart3">
-        {/* 요일별 평균 방문자 BarChart */}
-        <BarChart width={700} height={300} data={dayOfWeekData}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="day" />
-          <YAxis />
-          <Tooltip />
-          <Bar dataKey="avg" name="평균 방문자" />
-        </BarChart>
-
-        {/* ⭐ 요일별 외지인 / 현지인 BarChart */}
-        <BarChart width={700} height={300} data={dayOfWeekVisitorData}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="day" />
-          <YAxis />
-          <Tooltip />
-
-          {/* ⭐ 외지인 */}
-          <Bar dataKey="visitor" stackId="a" fill="#ff7f50" name="외지인" />
-
-          {/* ⭐ 현지인 */}
-          <Bar dataKey="resident" stackId="a" fill="#1e90ff" name="현지인" />
-        </BarChart>
-
-        {/* 요일 분석 */}
-        {dayOfWeekAnalysis && (
-          <div className="day-summary">
-            <p>
-              최대 방문 요일: {dayOfWeekAnalysis.maxDay.day} (
-              {dayOfWeekAnalysis.maxDay.avg.toLocaleString()}명)
-            </p>
-            <p>
-              최소 방문 요일: {dayOfWeekAnalysis.minDay.day} (
-              {dayOfWeekAnalysis.minDay.avg.toLocaleString()}명)
-            </p>
-            <p>
-              주말 평균 방문자: {dayOfWeekAnalysis.weekendAvg.toLocaleString()}
-              명
-            </p>
-            <p>
-              평일 평균 방문자: {dayOfWeekAnalysis.weekdayAvg.toLocaleString()}
-              명
-            </p>
-          </div>
-        )}
-      </div>
+      <Chart3
+        dayOfWeekData={dayOfWeekData}
+        dayOfWeekVisitorData={dayOfWeekVisitorData}
+        dayOfWeekAnalysis={dayOfWeekAnalysis}
+      />
       <pre>{JSON.stringify(selectedData, null, 2)}</pre>
     </div>
   );
