@@ -10,12 +10,165 @@ import {
   Legend,
 } from "recharts";
 
-const Chart3 = ({
-  dayOfWeekData,
-  dayOfWeekRatioData,
-  dayOfWeekAnalysis,
-  dayRanking,
-}) => {
+const Chart3 = ({ rawData }) => {
+  /* 요일별 평균 방문자 */
+  const dayOfWeekData = (() => {
+    if (!rawData || rawData.length === 0) return [];
+
+    const grouped = {};
+
+    rawData.forEach((item) => {
+      if (!grouped[item.day]) {
+        grouped[item.day] = { sum: 0, count: 0 };
+      }
+
+      grouped[item.day].sum += item.total;
+      grouped[item.day].count += 1;
+    });
+
+    const order = ["일", "월", "화", "수", "목", "금", "토"];
+
+    return order.map((day) => ({
+      day,
+      avg: grouped[day] ? Math.round(grouped[day].sum / grouped[day].count) : 0,
+    }));
+  })();
+
+  /* 요일별 평균 방문자 + 최대/최소 + 주말/평일 */
+  const dayOfWeekAnalysis = (() => {
+    if (!rawData || rawData.length === 0) return null;
+
+    const grouped = {};
+
+    rawData.forEach((item) => {
+      if (!grouped[item.day]) {
+        grouped[item.day] = { sum: 0, count: 0 };
+      }
+
+      grouped[item.day].sum += item.total;
+      grouped[item.day].count += 1;
+    });
+
+    const order = ["일", "월", "화", "수", "목", "금", "토"];
+
+    const avgData = order.map((day) => ({
+      day,
+      avg: grouped[day] ? Math.round(grouped[day].sum / grouped[day].count) : 0,
+    }));
+
+    // 최대 / 최소 요일
+    let maxDay = avgData[0];
+    let minDay = avgData[0];
+
+    avgData.forEach((item) => {
+      if (item.avg > maxDay.avg) maxDay = item;
+      if (item.avg < minDay.avg) minDay = item;
+    });
+
+    // 주말 vs 평일
+    const weekend = avgData.filter((d) => d.day === "토" || d.day === "일");
+    const weekday = avgData.filter((d) => !["토", "일"].includes(d.day));
+
+    const weekendAvg =
+      weekend.reduce((sum, d) => sum + d.avg, 0) / weekend.length;
+
+    const weekdayAvg =
+      weekday.reduce((sum, d) => sum + d.avg, 0) / weekday.length;
+
+    return {
+      avgData,
+      maxDay,
+      minDay,
+      weekendAvg: Math.round(weekendAvg),
+      weekdayAvg: Math.round(weekdayAvg),
+    };
+  })();
+
+  /*  요일별 외지인 / 현지인 */
+  const dayOfWeekVisitorData = (() => {
+    if (!rawData || rawData.length === 0) return [];
+
+    const grouped = {};
+
+    rawData.forEach((item) => {
+      if (!grouped[item.day]) {
+        grouped[item.day] = {
+          visitorSum: 0,
+          residentSum: 0,
+          count: 0,
+        };
+      }
+
+      grouped[item.day].visitorSum += item.visitor;
+      grouped[item.day].residentSum += item.resident;
+      grouped[item.day].count += 1;
+    });
+
+    const order = ["일", "월", "화", "수", "목", "금", "토"];
+
+    return order.map((day) => ({
+      day,
+      visitor: grouped[day]
+        ? Math.round(grouped[day].visitorSum / grouped[day].count)
+        : 0,
+      resident: grouped[day]
+        ? Math.round(grouped[day].residentSum / grouped[day].count)
+        : 0,
+    }));
+  })();
+
+  /* 요일별 방문자 순위 */
+  const dayRanking = (() => {
+    if (!dayOfWeekData || dayOfWeekData.length === 0) return [];
+
+    return [...dayOfWeekData]
+      .sort((a, b) => b.avg - a.avg)
+      .map((item, index) => ({
+        ...item,
+        rank: index + 1,
+      }));
+  })();
+
+  /* 요일별 외지인 비율 */
+  const dayOfWeekRatioData = (() => {
+    if (!rawData || rawData.length === 0) return [];
+
+    const grouped = {};
+
+    rawData.forEach((item) => {
+      if (!grouped[item.day]) {
+        grouped[item.day] = {
+          visitorSum: 0,
+          residentSum: 0,
+          count: 0,
+        };
+      }
+
+      grouped[item.day].visitorSum += item.visitor;
+      grouped[item.day].residentSum += item.resident;
+      grouped[item.day].count += 1;
+    });
+
+    const order = ["일", "월", "화", "수", "목", "금", "토"];
+
+    return order.map((day) => {
+      const visitor = grouped[day]
+        ? grouped[day].visitorSum / grouped[day].count
+        : 0;
+
+      const resident = grouped[day]
+        ? grouped[day].residentSum / grouped[day].count
+        : 0;
+
+      const total = visitor + resident;
+
+      return {
+        day,
+        visitorRatio: total ? visitor / total : 0,
+        residentRatio: total ? resident / total : 0,
+      };
+    });
+  })();
   return (
     <div className="Chart3">
       <div className="Chart3_1">

@@ -11,7 +11,47 @@ import {
   Bar,
 } from "recharts";
 
-const Chart1 = ({ trendData, summary }) => {
+const Chart1 = ({ rawData }) => {
+  /* 일별 방문자수 diff / rate 계산 */
+  const trendData = rawData?.map((item, index, arr) => {
+    if (index === 0) {
+      return { ...item, diff: 0, rate: 0 };
+    }
+
+    const prev = arr[index - 1];
+    const diff = item.total - prev.total;
+    const rate = prev.total ? diff / prev.total : 0;
+
+    return {
+      ...item,
+      diff,
+      rate,
+    };
+  });
+
+  /* 요약 지표 계산 */
+  const summary = (() => {
+    if (!rawData || rawData.length === 0) return null;
+
+    let max = rawData[0];
+    let min = rawData[0];
+    let sum = 0;
+
+    rawData.forEach((item) => {
+      if (item.total > max.total) max = item;
+      if (item.total < min.total) min = item;
+      sum += item.total;
+    });
+
+    const avg = Math.round(sum / rawData.length);
+
+    return {
+      max,
+      min,
+      avg,
+    };
+  })();
+
   return (
     <div className="Chart1">
       <div className="Chart1_1">

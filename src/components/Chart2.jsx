@@ -14,23 +14,88 @@ import {
 } from "recharts";
 import { useState } from "react";
 
-const Chart2 = ({
-  filteredRawData,
-  pieData,
-  visitorConcentration,
-  COLORS,
-  avgVisitorRatio,
-  residentSummary,
-}) => {
+const Chart2 = ({ rawData }) => {
   const [ratioType, setRatioType] = useState("visitor"); // Chart2_2에 현지인/외지인 그래프 토글 버튼 state
   const dataKey = ratioType === "visitor" ? "visitorRatio" : "residentRatio"; // 그래프 버튼 선택된 타입에 따라 dataKey 변경
+
+  /* PieChart 색상 */
+  const COLORS = ["#ff7f50", "#87cefa"];
+
+  /* PieChart용 데이터 (평균 비율 기반) */
+  const pieData = (() => {
+    if (!rawData || rawData.length === 0) return [];
+
+    let visitorSum = 0;
+    let residentSum = 0;
+
+    rawData.forEach((item) => {
+      visitorSum += item.visitor;
+      residentSum += item.resident;
+    });
+
+    return [
+      { name: "외지인", value: visitorSum },
+      { name: "현지인", value: residentSum },
+    ];
+  })();
+
+  /* 외지인 집중도 */
+  const visitorConcentration = (() => {
+    if (!rawData || rawData.length === 0) return null;
+
+    let maxItem = rawData[0];
+    let sum = 0;
+
+    rawData.forEach((item) => {
+      if (item.visitor > maxItem.visitor) maxItem = item;
+      sum += item.visitor;
+    });
+
+    const avg = sum / rawData.length;
+    const concentration = avg ? maxItem.visitor / avg : 0;
+
+    return {
+      maxItem,
+      avg,
+      concentration,
+    };
+  })();
+
+  /* 현지인 최대 / 평균 */
+  const residentSummary = (() => {
+    if (!rawData || rawData.length === 0) return null;
+
+    let maxItem = rawData[0];
+    let sum = 0;
+
+    rawData.forEach((item) => {
+      if (item.resident > maxItem.resident) maxItem = item;
+      sum += item.resident;
+    });
+
+    const avg = sum / rawData.length;
+
+    return {
+      maxItem,
+      avg,
+    };
+  })();
+
+  /* 평균 외지인 비율 */
+  const avgVisitorRatio = (() => {
+    if (!rawData || rawData.length === 0) return 0;
+
+    const sum = rawData.reduce((acc, item) => acc + item.visitorRatio, 0);
+
+    return sum / rawData.length;
+  })();
 
   return (
     <div className="Chart2">
       <div className="Chart2_1">
         {/* 외지인/현지인 LineChart */}
         <h3>현지인/외지인 방문자 수 추세</h3>
-        <LineChart width={600} height={320} data={filteredRawData}>
+        <LineChart width={600} height={320} data={rawData}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="date" />
           <YAxis />
@@ -62,7 +127,7 @@ const Chart2 = ({
       <div className="Chart2_2">
         <h3>현지인/외지인 비율 변화</h3>
         {/* 비율 LineChart  */}
-        <LineChart width={600} height={300} data={filteredRawData}>
+        <LineChart width={600} height={300} data={rawData}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="date" />
           <YAxis domain={[0, 1]} />
