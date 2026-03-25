@@ -388,6 +388,46 @@ const Dashboard = () => {
       }));
   })();
 
+  /* 요일별 외지인 비율 */
+  const dayOfWeekRatioData = (() => {
+    if (!filteredRawData || filteredRawData.length === 0) return [];
+
+    const grouped = {};
+
+    filteredRawData.forEach((item) => {
+      if (!grouped[item.day]) {
+        grouped[item.day] = {
+          visitorSum: 0,
+          residentSum: 0,
+          count: 0,
+        };
+      }
+
+      grouped[item.day].visitorSum += item.visitor;
+      grouped[item.day].residentSum += item.resident;
+      grouped[item.day].count += 1;
+    });
+
+    const order = ["일", "월", "화", "수", "목", "금", "토"];
+
+    return order.map((day) => {
+      const visitor = grouped[day]
+        ? grouped[day].visitorSum / grouped[day].count
+        : 0;
+
+      const resident = grouped[day]
+        ? grouped[day].residentSum / grouped[day].count
+        : 0;
+
+      const total = visitor + resident;
+
+      return {
+        day,
+        visitorRatio: total ? visitor / total : 0,
+        residentRatio: total ? resident / total : 0,
+      };
+    });
+  })();
   return (
     <div className="Dashboard">
       <div>
@@ -448,12 +488,12 @@ const Dashboard = () => {
         avgVisitorRatio={avgVisitorRatio}
         residentSummary={residentSummary}
       />
-      {/*<Chart3
+      <Chart3
         dayOfWeekData={dayOfWeekData}
-        dayOfWeekVisitorData={dayOfWeekVisitorData}
+        dayOfWeekRatioData={dayOfWeekRatioData}
         dayOfWeekAnalysis={dayOfWeekAnalysis}
         dayRanking={dayRanking}
-      />*/}
+      />
 
       <pre>{JSON.stringify(selectedData, null, 2)}</pre>
     </div>

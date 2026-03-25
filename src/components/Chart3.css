@@ -1,0 +1,52 @@
+.Chart3 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 50px;
+  padding: 24px;
+
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.Chart3_1,
+.Chart3_2,
+.Chart3_3 {
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+}
+
+.Chart3_4 {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+}
+
+.Chart3_4 .summary-card {
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
+.Chart3_3 .ranking-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+
+  padding-left: 50px;
+  padding-right: 50px;
+}
+
+.Chart3_3 .ranking-item {
+  font-size: 13px;
+  color: #374151;
+}
+
+.Chart3_3 .ranking-item.top-rank {
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
+}

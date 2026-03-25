@@ -1,66 +1,94 @@
 import "./Chart3.css";
 
-import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  Legend,
+} from "recharts";
 
 const Chart3 = ({
   dayOfWeekData,
-  dayOfWeekVisitorData,
+  dayOfWeekRatioData,
   dayOfWeekAnalysis,
   dayRanking,
 }) => {
   return (
     <div className="Chart3">
-      {/* 요일별 평균 방문자 BarChart */}
-      <BarChart width={700} height={300} data={dayOfWeekData}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="day" />
-        <YAxis />
-        <Tooltip />
-        <Bar dataKey="avg" name="평균 방문자" />
-      </BarChart>
+      <div className="Chart3_1">
+        {/* 요일별 평균 방문자 BarChart */}
+        <h3>요일별 평균 방문자 수</h3>
+        <BarChart width={700} height={300} data={dayOfWeekData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="day" />
+          <YAxis />
+          <Tooltip />
+          <Bar dataKey="avg" name="평균 방문자" />
+        </BarChart>
+        <p className="chart-desc">
+          ※요일별 평균 방문자 수를 나타내며, 특정 요일의 방문 규모를 비교할 수
+          있는 그래프
+        </p>
+      </div>
+      <div className="Chart3_2">
+        {/* 요일별 외지인 비율 */}
+        <h3>요일별 외지인/현지인 비율</h3>
+        <BarChart width={700} height={300} data={dayOfWeekRatioData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="day" />
+          <YAxis domain={[0, 1]} />
 
-      {/* ⭐ 요일별 외지인 / 현지인 BarChart */}
-      <BarChart width={700} height={300} data={dayOfWeekVisitorData}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="day" />
-        <YAxis />
-        <Tooltip />
+          <Tooltip formatter={(v) => (v * 100).toFixed(1) + "%"} />
+          <Legend />
 
-        {/* ⭐ 외지인 */}
-        <Bar dataKey="visitor" stackId="a" fill="#ff7f50" name="외지인" />
+          {/* 외지인 */}
+          <Bar dataKey="visitorRatio" fill="#ff7f50" name="외지인 비율" />
 
-        {/* ⭐ 현지인 */}
-        <Bar dataKey="resident" stackId="a" fill="#1e90ff" name="현지인" />
-      </BarChart>
+          {/* 현지인 */}
+          <Bar dataKey="residentRatio" fill="#1e90ff" name="현지인 비율" />
+        </BarChart>
+        <p className="chart-desc">
+          ※요일별 전체 방문자 중 외지인과 현지인이 차지하는 비율을 비교한 그래프
+        </p>
+      </div>
+      <div className="Chart3_3">
+        {dayRanking && dayRanking.length > 0 && (
+          <>
+            <h3>요일별 방문자 순위</h3>
 
-      {/* 요일 분석 */}
+            <div className="summary-card ranking-card">
+              {dayRanking.map((item) => (
+                <p
+                  key={item.day}
+                  className={`ranking-item ${item.rank <= 3 ? "top-rank" : ""}`}
+                >
+                  {item.rank}위: {item.day} ({item.avg.toLocaleString()}명)
+                </p>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
       {dayOfWeekAnalysis && (
-        <div className="day-summary">
-          <p>
-            최대 방문 요일: {dayOfWeekAnalysis.maxDay.day} (
-            {dayOfWeekAnalysis.maxDay.avg.toLocaleString()}명)
-          </p>
-          <p>
-            최소 방문 요일: {dayOfWeekAnalysis.minDay.day} (
-            {dayOfWeekAnalysis.minDay.avg.toLocaleString()}명)
-          </p>
-          <p>
-            주말 평균 방문자: {dayOfWeekAnalysis.weekendAvg.toLocaleString()}명
-          </p>
-          <p>
-            평일 평균 방문자: {dayOfWeekAnalysis.weekdayAvg.toLocaleString()}명
-          </p>
-        </div>
-      )}
-      {/* 요일별 방문자 순위 */}
-      {dayRanking && dayRanking.length > 0 && (
-        <div className="day-ranking">
-          <h4>요일별 방문자 순위</h4>
-          {dayRanking.map((item) => (
-            <p key={item.day}>
-              {item.rank}위: {item.day} ({item.avg.toLocaleString()}명)
+        <div className="Chart3_4">
+          {/* 주말 */}
+          <div className="summary-card">
+            <p className="label">주말 평균 방문자</p>
+            <p className="value">
+              {dayOfWeekAnalysis.weekendAvg.toLocaleString()}명
             </p>
-          ))}
+          </div>
+
+          {/* 평일 */}
+          <div className="summary-card">
+            <p className="label">평일 평균 방문자</p>
+            <p className="value">
+              {dayOfWeekAnalysis.weekdayAvg.toLocaleString()}명
+            </p>
+          </div>
         </div>
       )}
     </div>
