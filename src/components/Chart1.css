@@ -2,7 +2,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 20px;
+  gap: 80px;
   padding: 24px;
 
   background: #ffffff;
@@ -24,7 +24,7 @@
   align-items: stretch;
 }
 
-.summary-card {
+.Chart1_3 .summary-card {
   background: #f8fafc;
   padding: 16px;
   border-radius: 12px;
@@ -37,7 +37,7 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
-.chart-desc {
+.Chart1_3 .chart-desc {
   font-size: 13px;
   color: #6b7280;
   margin-bottom: 10px;
@@ -46,19 +46,19 @@
   margin-left: 50px;
 }
 
-.summary-card .label {
+.Chart1_3 .summary-card .label {
   font-size: 13px;
   color: #6b7280;
   margin-bottom: 6px;
 }
 
-.summary-card .value {
+.Chart1_3 .summary-card .value {
   font-size: 16px;
   font-weight: 600;
   color: #111827;
 }
 
-.summary-card .sub {
+.Chart1_3 .summary-card .sub {
   font-size: 13px;
   color: #374151;
 }

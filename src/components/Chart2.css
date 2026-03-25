@@ -36,9 +36,9 @@
   color: white;
 }
 
-.summary-cards {
+.Chart2 .summary-cards {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* ⭐ 3개씩 */
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
   height: 400px;
 }
@@ -47,4 +47,43 @@
   text-align: left;
   align-self: flex-start;
   margin-left: 0px;
+}
+
+.Chart .summary-card {
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 12px;
+  min-width: 140px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.Chart2 .chart-desc {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 10px;
+  text-align: left;
+  align-self: flex-start;
+  margin-left: 50px;
+}
+
+.Chart2 .summary-card .label {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 6px;
+}
+
+.Chart2 .summary-card .value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.Chart2 .summary-card .sub {
+  font-size: 13px;
+  color: #374151;
 }

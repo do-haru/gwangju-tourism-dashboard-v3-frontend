@@ -2,7 +2,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 50px;
+  gap: 80px;
   padding: 24px;
 
   background: #ffffff;
@@ -22,12 +22,7 @@
 .Chart3_4 {
   display: flex;
   gap: 16px;
-  align-items: stretch;
-}
-
-.Chart3_4 .summary-card {
-  padding-top: 40px;
-  padding-bottom: 40px;
+  align-items: center;
 }
 
 .Chart3_3 .ranking-card {
@@ -49,4 +44,44 @@
   font-size: 15px;
   font-weight: 600;
   color: #111827;
+}
+
+.Chart3 .summary-card {
+  background: #f8fafc;
+  padding-top: 40px;
+  padding-bottom: 40px;
+  border-radius: 12px;
+  min-width: 140px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.Chart3 .chart-desc {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 10px;
+  text-align: left;
+  align-self: flex-start;
+  margin-left: 50px;
+}
+
+.Chart3 .summary-card .label {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 6px;
+}
+
+.Chart3 .summary-card .value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.Chart3 .summary-card .sub {
+  font-size: 13px;
+  color: #374151;
 }
