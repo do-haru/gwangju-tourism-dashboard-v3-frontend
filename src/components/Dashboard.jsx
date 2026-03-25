@@ -3,19 +3,6 @@ import "./Dashboard.css";
 import { visitorFiles } from "../data/visitorFiles";
 
 import { useEffect, useState } from "react";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts";
 import Chart1 from "./Chart1";
 import Chart2 from "./Chart2";
 import Chart3 from "./Chart3";
@@ -430,7 +417,7 @@ const Dashboard = () => {
   })();
   return (
     <div className="Dashboard">
-      <div>
+      <div className="control-bar">
         {/* 행정동 선택 dropdown */}
         <select
           value={selectedDong}
@@ -478,24 +465,25 @@ const Dashboard = () => {
           ))}
         </select>
       </div>
-      <Chart1 trendData={trendData} summary={summary} />
 
-      <Chart2
-        filteredRawData={filteredRawData}
-        pieData={pieData}
-        visitorConcentration={visitorConcentration}
-        COLORS={COLORS}
-        avgVisitorRatio={avgVisitorRatio}
-        residentSummary={residentSummary}
-      />
-      <Chart3
-        dayOfWeekData={dayOfWeekData}
-        dayOfWeekRatioData={dayOfWeekRatioData}
-        dayOfWeekAnalysis={dayOfWeekAnalysis}
-        dayRanking={dayRanking}
-      />
+      <div className="Chart">
+        <Chart1 trendData={trendData} summary={summary} />
 
-      <pre>{JSON.stringify(selectedData, null, 2)}</pre>
+        <Chart2
+          filteredRawData={filteredRawData}
+          pieData={pieData}
+          visitorConcentration={visitorConcentration}
+          COLORS={COLORS}
+          avgVisitorRatio={avgVisitorRatio}
+          residentSummary={residentSummary}
+        />
+        <Chart3
+          dayOfWeekData={dayOfWeekData}
+          dayOfWeekRatioData={dayOfWeekRatioData}
+          dayOfWeekAnalysis={dayOfWeekAnalysis}
+          dayRanking={dayRanking}
+        />
+      </div>
     </div>
   );
 };
