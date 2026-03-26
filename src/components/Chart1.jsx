@@ -68,8 +68,9 @@ const Chart1 = ({ rawData }) => {
           ※날짜별 전체 방문자 수의 변화를 나타내는 그래프
         </p>
       </div>
+      {/* BarChart (증가/감소) */}
+      {/*
       <div className="Chart1_2">
-        {/* BarChart (증가/감소) */}
         <h3>일별 방문자 증감</h3>
         <BarChart width={700} height={300} data={trendData}>
           <CartesianGrid strokeDasharray="3 3" />
@@ -82,7 +83,9 @@ const Chart1 = ({ rawData }) => {
           ※전일 대비 방문자 수의 증가 및 감소를 나타내는 그래프
         </p>
       </div>
+*/}
       {/* 방문자수 최대, 최소, 평균 지표 */}
+      {/*
       {summary && (
         <div className="Chart1_3">
           <div className="summary-card">
@@ -103,6 +106,7 @@ const Chart1 = ({ rawData }) => {
           </div>
         </div>
       )}
+*/}
     </div>
   );
 };

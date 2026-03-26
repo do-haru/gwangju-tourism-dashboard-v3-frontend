@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import Chart1 from "./Chart1";
 import Chart2 from "./Chart2";
 import Chart3 from "./Chart3";
+import Chart4 from "./Chart4";
 
 // CSV 문자열 -> JS 객체 배열로 변환
 const parseCSV = (text) => {
@@ -336,9 +337,12 @@ const Dashboard = () => {
 
       <div className="Chart">
         <Chart1 rawData={finalData} />
+        <Chart4 />
 
-        <Chart2 rawData={finalData} />
-        <Chart3 rawData={finalData} />
+        {/*
+          <Chart2 rawData={finalData} />
+          <Chart3 rawData={finalData} />
+        */}
       </div>
     </div>
   );
