@@ -111,7 +111,7 @@ const preprocess = (data) => {
  * data: 과거 방문자 데이터 배열
  * days: 몇 일 예측할지
  */
-const predictLinear = (data, days, year, month, monthOffset) => {
+const predictLinear = (data, days, year, month, dayOffset) => {
   if (!data || data.length === 0) return [];
 
   const n = data.length;
@@ -136,7 +136,7 @@ const predictLinear = (data, days, year, month, monthOffset) => {
   const predictions = [];
 
   for (let i = 1; i <= days; i++) {
-    const nextX = n + monthOffset * days + i - 1;
+    const nextX = n + dayOffset + i - 1;
     const predicted = slope * nextX + intercept;
 
     const date = `${year}-${String(month).padStart(2, "0")}-${String(i).padStart(2, "0")}`;
@@ -191,17 +191,19 @@ const Dashboard = () => {
   // 예측을 위한 코드
   const baseData = visitorData[selectedDong];
 
+  // 마지막 데이터 이후로 몇일이 지났는지 계산
   const last = baseData?.[baseData.length - 1];
-  const lastYear = last ? Number(last.date.slice(0, 4)) : 0;
-  const lastMonth = last ? Number(last.date.slice(5, 7)) : 0;
 
-  // 선택 날짜
-  const selectedYearNum = Number(selectedYear);
-  const selectedMonthNum = Number(selectedMonth);
+  let dayOffset = 0;
 
-  // offset 계산 (개월 차이)
-  const monthOffset =
-    selectedYearNum * 12 + selectedMonthNum - (lastYear * 12 + lastMonth);
+  if (last) {
+    const lastDate = new Date(last.date);
+    const selectedDate = new Date(`${selectedYear}-${selectedMonth}-01`);
+
+    const diffTime = selectedDate - lastDate;
+    dayOffset = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  }
+
   // 선형회귀를 위한 한 달이 몇일인지 날짜 계산
   const daysInMonth = new Date(
     Number(selectedYear),
@@ -221,7 +223,7 @@ const Dashboard = () => {
       daysInMonth,
       selectedYear,
       selectedMonth,
-      monthOffset,
+      dayOffset,
     );
     finalData = predictedData;
   }
