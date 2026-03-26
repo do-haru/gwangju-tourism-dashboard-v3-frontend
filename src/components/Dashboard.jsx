@@ -202,6 +202,12 @@ const Dashboard = () => {
   // offset 계산 (개월 차이)
   const monthOffset =
     selectedYearNum * 12 + selectedMonthNum - (lastYear * 12 + lastMonth);
+  // 선형회귀를 위한 한 달이 몇일인지 날짜 계산
+  const daysInMonth = new Date(
+    Number(selectedYear),
+    Number(selectedMonth),
+    0,
+  ).getDate();
 
   let finalData;
 
@@ -212,7 +218,7 @@ const Dashboard = () => {
     // ❌ 실제 데이터 없음 → 예측 사용
     const predictedData = predictLinear(
       baseData,
-      31,
+      daysInMonth,
       selectedYear,
       selectedMonth,
       monthOffset,
