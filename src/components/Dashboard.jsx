@@ -106,6 +106,52 @@ const preprocess = (data) => {
   return result;
 };
 
+/**
+ * 선형회귀
+ * data: 과거 방문자 데이터 배열
+ * days: 몇 일 예측할지
+ */
+const predictLinear = (data, days, year, month, monthOffset) => {
+  if (!data || data.length === 0) return [];
+
+  const n = data.length;
+  const x = data.map((_, i) => i);
+  const y = data.map((d) => d.total);
+
+  let sumX = 0,
+    sumY = 0,
+    sumXY = 0,
+    sumXX = 0;
+
+  for (let i = 0; i < n; i++) {
+    sumX += x[i];
+    sumY += y[i];
+    sumXY += x[i] * y[i];
+    sumXX += x[i] * x[i];
+  }
+
+  const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+  const intercept = (sumY - slope * sumX) / n;
+
+  const predictions = [];
+
+  for (let i = 1; i <= days; i++) {
+    const nextX = n + monthOffset * days + i - 1;
+    const predicted = slope * nextX + intercept;
+
+    const date = `${year}-${String(month).padStart(2, "0")}-${String(i).padStart(2, "0")}`;
+
+    predictions.push({
+      ...data[data.length - 1],
+      date,
+      total: Math.round(predicted),
+      isPredicted: true,
+    });
+  }
+
+  return predictions;
+};
+
 const Dashboard = () => {
   const [visitorData, setVisitorData] = useState({}); // 일별 방문자수 데이터 저장 변수
   const [selectedDong, setSelectedDong] = useState("동명동"); // 선택된 행정동 저장 변수
@@ -141,6 +187,40 @@ const Dashboard = () => {
 
     return year === selectedYear && month === selectedMonth;
   });
+
+  // 예측을 위한 코드
+  const baseData = visitorData[selectedDong];
+
+  const last = baseData?.[baseData.length - 1];
+  const lastYear = last ? Number(last.date.slice(0, 4)) : 0;
+  const lastMonth = last ? Number(last.date.slice(5, 7)) : 0;
+
+  // 선택 날짜
+  const selectedYearNum = Number(selectedYear);
+  const selectedMonthNum = Number(selectedMonth);
+
+  // offset 계산 (개월 차이)
+  const monthOffset =
+    selectedYearNum * 12 + selectedMonthNum - (lastYear * 12 + lastMonth);
+
+  let finalData;
+
+  if (filteredRawData && filteredRawData.length > 0) {
+    // ✅ 실제 데이터 있음
+    finalData = filteredRawData;
+  } else {
+    // ❌ 실제 데이터 없음 → 예측 사용
+    const predictedData = predictLinear(
+      baseData,
+      31,
+      selectedYear,
+      selectedMonth,
+      monthOffset,
+    );
+    finalData = predictedData;
+  }
+
+  console.log(finalData);
 
   return (
     <div className="Dashboard">
@@ -194,10 +274,10 @@ const Dashboard = () => {
       </div>
 
       <div className="Chart">
-        <Chart1 rawData={filteredRawData} />
+        <Chart1 rawData={finalData} />
 
-        <Chart2 rawData={filteredRawData} />
-        <Chart3 rawData={filteredRawData} />
+        <Chart2 rawData={finalData} />
+        <Chart3 rawData={finalData} />
       </div>
     </div>
   );
