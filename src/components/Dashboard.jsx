@@ -107,12 +107,55 @@ const preprocess = (data) => {
 };
 
 /**
+ * 요일 패턴
+ */
+const getWeekdayPattern = (data) => {
+  const weekdayMap = {
+    0: [],
+    1: [],
+    2: [],
+    3: [],
+    4: [],
+    5: [],
+    6: [],
+  };
+
+  // 요일별로 데이터 모으기
+  data.forEach((d) => {
+    weekdayMap[d.dayIndex].push(d.total);
+  });
+
+  // 전체 평균
+  const allValues = data.map((d) => d.total);
+  const overallAvg = allValues.reduce((a, b) => a + b, 0) / allValues.length;
+
+  const pattern = {};
+
+  // 요일별 평균 → 전체 평균과 차이 계산
+  for (let i = 0; i < 7; i++) {
+    const arr = weekdayMap[i];
+
+    if (arr.length === 0) {
+      pattern[i] = 0;
+      continue;
+    }
+
+    const avg = arr.reduce((a, b) => a + b, 0) / arr.length;
+    pattern[i] = avg - overallAvg;
+  }
+
+  return pattern;
+};
+
+/**
  * 선형회귀
  * data: 과거 방문자 데이터 배열
  * days: 몇 일 예측할지
  */
 const predictLinear = (data, days, year, month, dayOffset) => {
   if (!data || data.length === 0) return [];
+
+  const weekdayPattern = getWeekdayPattern(data);
 
   const n = data.length;
   const x = data.map((_, i) => i);
@@ -137,7 +180,17 @@ const predictLinear = (data, days, year, month, dayOffset) => {
 
   for (let i = 1; i <= days; i++) {
     const nextX = n + dayOffset + i - 1;
-    const predicted = slope * nextX + intercept;
+    const base = slope * nextX + intercept;
+
+    // 날짜 기준 요일 계산
+    const dateObj = new Date(
+      `${year}-${String(month).padStart(2, "0")}-${String(i).padStart(2, "0")}`,
+    );
+
+    const dayIndex = dateObj.getDay();
+
+    // 요일 보정값 추가
+    const predicted = base + weekdayPattern[dayIndex];
 
     const date = `${year}-${String(month).padStart(2, "0")}-${String(i).padStart(2, "0")}`;
 
