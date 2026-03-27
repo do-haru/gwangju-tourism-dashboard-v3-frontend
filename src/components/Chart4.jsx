@@ -20,21 +20,17 @@ const ResizeMap = () => {
 };
 
 const Chart4 = () => {
-  // Dropdown 버튼의 년, 월, 일 선택 state
-  const [selectedYear, setSelectedYear] = useState("2025");
+  // Year 고정, Slider의 month 선택 state
+  const selectedYear = "2025";
   const [selectedMonth, setSelectedMonth] = useState("01");
-  const [selectedDay, setSelectedDay] = useState("01");
 
-  const [selectedTime, setSelectedTime] = useState(12); // Slider 시간 선택 state
   const [flowData, setFlowData] = useState([]); // CSV에서 불러온 dummy data
-
-  const selectedDate = selectedYear + selectedMonth + selectedDay; // 선택된 날짜를 문자열로 합침
 
   // GeoJSON에서 동구만 필터
   const filteredGeoData = {
     ...geoData,
     features: geoData.features.filter(
-      (feature) => feature.properties.sggnm === "동구",
+      (feature) => feature.properties.sggnm === "동구"
     ),
   };
 
@@ -76,20 +72,6 @@ const Chart4 = () => {
         };
       });
   };
-  // 선택된 날짜 + 시간에 해당하는 데이터만 필터링
-  const currentData = flowData.filter(
-    (d) => d.date === selectedDate && d.time === selectedTime,
-  );
-
-  console.log("selectedDate:", selectedDate);
-  console.log("selectedTime:", selectedTime);
-  console.log("currentData:", currentData);
-
-  // 행정동의 유동인구 값 가져오기
-  const getValueByRegion = (region) => {
-    const found = currentData.find((d) => d.region === region);
-    return found ? found.value : 0;
-  };
 
   // 색 함수
   const getColor = (value) => {
@@ -108,7 +90,11 @@ const Chart4 = () => {
     features: filteredGeoData.features.map((feature) => {
       const dong = feature.properties.adm_nm.split(" ").pop();
 
-      const found = currentData.find((d) => d.region === dong);
+      console.log("geo dong:", dong);
+
+      const found = flowData.find((d) => d.region === dong);
+
+      console.log("match:", found);
 
       return {
         ...feature,
@@ -131,16 +117,18 @@ const Chart4 = () => {
     });
 
     layer.on("click", () => {
-      const value = feature.properties.value;
+      // ✅ 여기 수정
+      const found = flowData.find((d) => d.region === dong);
+      const value = found ? found.value : 0;
 
       layer
         .bindPopup(
           `
-        <div>
-          <strong>${dong}</strong><br/>
-          유동인구: ${value}
-        </div>
-      `,
+          <div>
+            <strong>${dong}</strong><br/>
+            방문자수: ${value}
+          </div>
+        `
         )
         .openPopup();
     });
@@ -160,57 +148,22 @@ const Chart4 = () => {
 
   return (
     <div className="Chart4">
-      {/* 날짜 선택 drop down  UI */}
-      <div className="DateSelector">
-        <select
-          value={selectedYear}
-          onChange={(e) => setSelectedYear(e.target.value)}
-        >
-          <option value="2025">2025년</option>
-        </select>
-
-        <select
-          value={selectedMonth}
-          onChange={(e) => setSelectedMonth(e.target.value)}
-        >
-          {[...Array(12)].map((_, i) => {
-            const m = String(i + 1).padStart(2, "0");
-            return (
-              <option key={m} value={m}>
-                {m}월
-              </option>
-            );
-          })}
-        </select>
-
-        <select
-          value={selectedDay}
-          onChange={(e) => setSelectedDay(e.target.value)}
-        >
-          {[...Array(31)].map((_, i) => {
-            const d = String(i + 1).padStart(2, "0");
-            return (
-              <option key={d} value={d}>
-                {d}일
-              </option>
-            );
-          })}
-        </select>
-      </div>
       {/* 시간 선택 Slider UI */}
       <div className="Slider">
         <input
           type="range"
-          min="0"
-          max="23"
+          min="1"
+          max="12"
           step="1"
-          value={selectedTime}
-          onChange={(e) => setSelectedTime(Number(e.target.value))}
-          style={{ width: "100%" }}
+          value={Number(selectedMonth)}
+          onChange={(e) => {
+            const m = String(e.target.value).padStart(2, "0");
+            setSelectedMonth(m);
+          }}
         />
 
         <div style={{ textAlign: "center", marginTop: "8px" }}>
-          {selectedTime}시
+          {selectedMonth}월
         </div>
       </div>
       {/* 지도 UI */}
@@ -223,7 +176,7 @@ const Chart4 = () => {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           <GeoJSON
-            key={selectedDate + selectedTime}
+            key={selectedMonth}
             data={mergedGeoData}
             style={(feature) => {
               const value = feature.properties.value;
