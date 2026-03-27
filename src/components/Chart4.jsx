@@ -38,6 +38,7 @@ const Chart4 = () => {
     ),
   };
 
+  /**
   // 유동인구 더미 데이터 파싱 함수
   // CSV 문자열 → JS 객체로 변환
   const parseFlowCSV = (text) => {
@@ -56,7 +57,25 @@ const Chart4 = () => {
         };
       });
   };
+*/
 
+  // 월별 방문자수 데이터 파싱 함수
+  const parseVisitorCSV = (text, year, month) => {
+    const lines = text.split("\n").slice(1);
+
+    return lines
+      .filter((line) => line.trim() !== "")
+      .map((line) => {
+        const [region, visitors] = line.split(",");
+
+        return {
+          year,
+          month,
+          region: region.trim(),
+          value: Number(visitors),
+        };
+      });
+  };
   // 선택된 날짜 + 시간에 해당하는 데이터만 필터링
   const currentData = flowData.filter(
     (d) => d.date === selectedDate && d.time === selectedTime,
@@ -126,14 +145,18 @@ const Chart4 = () => {
         .openPopup();
     });
   };
+
   useEffect(() => {
-    fetch("/data/flow/2025_flow_full.csv")
+    const fileName = `${selectedYear}${selectedMonth}_visitor.csv`;
+
+    fetch(`/data/visitor_month/${fileName}`)
       .then((res) => res.text())
       .then((text) => {
-        const parsed = parseFlowCSV(text);
+        const parsed = parseVisitorCSV(text, selectedYear, selectedMonth);
+        console.log("월별 방문자수: ", parsed);
         setFlowData(parsed);
       });
-  }, []);
+  }, [selectedYear, selectedMonth]);
 
   return (
     <div className="Chart4">
