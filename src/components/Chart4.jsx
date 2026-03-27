@@ -21,6 +21,25 @@ const ResizeMap = () => {
 
 const Chart4 = () => {
   const [selectedTime, setSelectedTime] = useState(12);
+  const [flowData, setFlowData] = useState([]);
+
+  // 유동인구 더미 데이터 파싱 함수
+  const parseFlowCSV = (text) => {
+    const lines = text.split("\n").slice(1);
+
+    return lines
+      .filter((line) => line.trim() !== "")
+      .map((line) => {
+        const [date, region, time, value] = line.split(",");
+
+        return {
+          date,
+          region,
+          time: Number(time),
+          value: Number(value),
+        };
+      });
+  };
 
   // GeoJSON에서 동구만 필터
   const filteredGeoData = {
@@ -29,6 +48,16 @@ const Chart4 = () => {
       (feature) => feature.properties.sggnm === "동구",
     ),
   };
+
+  useEffect(() => {
+    fetch("/data/flow/2025_flow_full.csv")
+      .then((res) => res.text())
+      .then((text) => {
+        const parsed = parseFlowCSV(text);
+        console.log(parsed); // 콘솔 확인 테스트
+        setFlowData(parsed);
+      });
+  }, []);
 
   return (
     <div className="Chart4">
