@@ -20,11 +20,42 @@
 }
 
 .MapSection {
-  width: 800px;
-  height: 800px; /* 지도 크기 여기서 조절 */
+  display: flex;
+  justify-content: center;
+
+  width: 100%;
+  height: 100%;
 }
 
 .map {
-  width: 100%;
-  height: 100%;
+  width: 800px;
+  height: 800px;
+}
+
+.Legend {
+  background-color: #ffffff;
+  position: absolute;
+  bottom: 310px;
+  right: 600px;
+}
+
+.Legend div {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.Legend span {
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+}
+
+.dong-label {
+  font-size: 12px;
+  font-weight: bold;
+  color: #111;
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }

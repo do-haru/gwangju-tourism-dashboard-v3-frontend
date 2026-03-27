@@ -79,16 +79,26 @@ const Chart4 = () => {
     return "#FFEDA0";
   };
 
+  // 지도 위에 글씨 쓰기
+  const onEachFeature = (feature, layer) => {
+    const dong = feature.properties.adm_nm.split(" ").pop();
+
+    layer.bindTooltip(dong, {
+      permanent: true,
+      direction: "center",
+      className: "dong-label",
+    });
+  };
+
   useEffect(() => {
     fetch("/data/flow/2025_flow_full.csv")
       .then((res) => res.text())
       .then((text) => {
         const parsed = parseFlowCSV(text);
-        console.log(parsed); // 콘솔 확인 테스트
         setFlowData(parsed);
       });
   }, []);
-  console.log(geoData.features.map((f) => f.properties.adm_nm));
+
   return (
     <div className="Chart4">
       {/* 날짜 선택 drop down  UI */}
@@ -166,8 +176,32 @@ const Chart4 = () => {
                 fillOpacity: 0.7,
               };
             }}
+            onEachFeature={onEachFeature}
           />
         </MapContainer>
+        <div className="Legend">
+          <div>
+            <span style={{ background: "#800026" }}></span> 1500+
+          </div>
+          <div>
+            <span style={{ background: "#BD0026" }}></span> 1200+
+          </div>
+          <div>
+            <span style={{ background: "#E31A1C" }}></span> 900+
+          </div>
+          <div>
+            <span style={{ background: "#FC4E2A" }}></span> 700+
+          </div>
+          <div>
+            <span style={{ background: "#FD8D3C" }}></span> 500+
+          </div>
+          <div>
+            <span style={{ background: "#FEB24C" }}></span> 300+
+          </div>
+          <div>
+            <span style={{ background: "#FFEDA0" }}></span> 낮음
+          </div>
+        </div>
       </div>
     </div>
   );
