@@ -142,7 +142,7 @@ const getWeekdayPattern = (data) => {
     }
 
     const avg = arr.reduce((a, b) => a + b, 0) / arr.length;
-    pattern[i] = avg - overallAvg;
+    pattern[i] = avg / overallAvg;
   }
 
   return pattern;
@@ -191,7 +191,7 @@ const predictLinear = (data, days, year, month, dayOffset) => {
     const dayIndex = dateObj.getDay();
 
     // 요일 보정값 추가
-    const predicted = base + weekdayPattern[dayIndex];
+    const predicted = base * weekdayPattern[dayIndex];
 
     const date = `${year}-${String(month).padStart(2, "0")}-${String(i).padStart(2, "0")}`;
 
