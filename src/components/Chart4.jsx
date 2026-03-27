@@ -1,8 +1,10 @@
 import "./Chart4.css";
 
-import { MapContainer, TileLayer, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, useMap, GeoJSON } from "react-leaflet";
 import { useEffect, useState } from "react";
 import "leaflet/dist/leaflet.css";
+
+import geoData from "../assets/gwangju.json";
 
 // 지도 크기 강제 재계산
 const ResizeMap = () => {
@@ -19,6 +21,14 @@ const ResizeMap = () => {
 
 const Chart4 = () => {
   const [selectedTime, setSelectedTime] = useState(12);
+
+  // GeoJSON에서 동구만 필터
+  const filteredGeoData = {
+    ...geoData,
+    features: geoData.features.filter(
+      (feature) => feature.properties.sggnm === "동구",
+    ),
+  };
 
   return (
     <div className="Chart4">
@@ -44,6 +54,14 @@ const Chart4 = () => {
           <TileLayer
             attribution="&copy; OpenStreetMap contributors"
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          <GeoJSON
+            data={filteredGeoData}
+            style={() => ({
+              color: "#333",
+              weight: 1,
+              fillOpacity: 0.1,
+            })}
           />
         </MapContainer>
       </div>

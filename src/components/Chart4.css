@@ -16,11 +16,11 @@
 }
 
 .Slider {
-  width: 500px;
+  width: 800px;
 }
 
 .MapSection {
-  width: 500px;
+  width: 800px;
   height: 800px; /* 지도 크기 여기서 조절 */
 }
 

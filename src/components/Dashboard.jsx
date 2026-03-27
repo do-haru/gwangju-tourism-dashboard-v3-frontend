@@ -1,6 +1,7 @@
 import "./Dashboard.css";
 
 import { visitorFiles } from "../data/visitorFiles";
+import geoData from "../assets/gwangju.json";
 
 import { useEffect, useState } from "react";
 import Chart1 from "./Chart1";
@@ -283,6 +284,7 @@ const Dashboard = () => {
   }
 
   console.log(finalData);
+  console.log(geoData.features[0].properties);
 
   return (
     <div className="Dashboard">
