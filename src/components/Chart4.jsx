@@ -19,12 +19,29 @@ const ResizeMap = () => {
   return null;
 };
 
+const regions = [
+  "계림1동",
+  "계림2동",
+  "충장동",
+  "동명동",
+  "산수1동",
+  "산수2동",
+  "서남동",
+  "지산1동",
+  "지산2동",
+  "지원1동",
+  "지원2동",
+  "학동",
+  "학운동",
+];
+
 const Chart4 = () => {
   // Year 고정, Slider의 month 선택 state
   const selectedYear = "2025";
   const [selectedMonth, setSelectedMonth] = useState("01");
 
   const [flowData, setFlowData] = useState([]); // CSV에서 불러온 dummy data
+  const [consumeData, setConsumeData] = useState([]);
 
   // GeoJSON에서 동구만 필터
   const filteredGeoData = {
@@ -73,15 +90,53 @@ const Chart4 = () => {
       });
   };
 
+  // 소비량 데이터
+  const parseConsumeCSV = (text, year, month) => {
+    const lines = text.split("\n").slice(1);
+
+    return lines
+      .filter((line) => line.trim() !== "")
+      .map((line) => {
+        const parts = line.split(",");
+
+        // 🔥 방어 코드
+        if (parts.length < 4) return null;
+
+        const date = parts[0];
+        const region = parts[1];
+        const type = parts[2];
+        const value = parts[3];
+
+        return {
+          date,
+          region: region?.trim(),
+          type: type?.trim(),
+          value: Number(value),
+        };
+      })
+      .filter((d) => d !== null)
+      .filter((d) => d.date === `${year}${month}` && d.type === "관광총소비");
+  };
+
   // 색 함수
   const getColor = (value) => {
-    if (value > 1500) return "#800026";
-    if (value > 1200) return "#BD0026";
-    if (value > 900) return "#E31A1C";
-    if (value > 700) return "#FC4E2A";
-    if (value > 500) return "#FD8D3C";
-    if (value > 300) return "#FEB24C";
+    if (value > 25) return "#800026";
+    if (value > 23) return "#BD0026";
+    if (value > 21) return "#E31A1C";
+    if (value > 19) return "#FC4E2A";
+    if (value > 17) return "#FD8D3C";
+    if (value > 15) return "#FEB24C";
     return "#FFEDA0";
+  };
+
+  const getCombinedValue = (dong) => {
+    const visitor = flowData.find((d) => d.region === dong);
+    const consume = consumeData.find((d) => d.region === dong);
+
+    const v = visitor ? visitor.value : 0;
+    const c = consume ? consume.value : 0;
+
+    return Math.log(v * c); // 🔥 핵심
   };
 
   // 지도 데이터(GeoJSON)에 유동인구 값 추가
@@ -90,17 +145,14 @@ const Chart4 = () => {
     features: filteredGeoData.features.map((feature) => {
       const dong = feature.properties.adm_nm.split(" ").pop();
 
-      console.log("geo dong:", dong);
-
       const found = flowData.find((d) => d.region === dong);
 
-      console.log("match:", found);
-
+      const combinedValue = getCombinedValue(dong);
       return {
         ...feature,
         properties: {
           ...feature.properties,
-          value: found ? found.value : 0,
+          value: combinedValue,
         },
       };
     }),
@@ -119,7 +171,7 @@ const Chart4 = () => {
     layer.on("click", () => {
       // ✅ 여기 수정
       const found = flowData.find((d) => d.region === dong);
-      const value = found ? found.value : 0;
+      const value = getCombinedValue(dong);
 
       layer
         .bindPopup(
@@ -145,6 +197,28 @@ const Chart4 = () => {
         setFlowData(parsed);
       });
   }, [selectedYear, selectedMonth]);
+
+  useEffect(() => {
+    Promise.all(
+      regions.map((region) => {
+        return fetch(`/data/consumption/2025_${region}_관광소비 추이.csv`)
+          .then((res) => res.text())
+          .then((text) => {
+            const parsed = parseConsumeCSV(text, selectedYear, selectedMonth);
+
+            // 🔥 한 동 → 하나 값만 나옴
+            return parsed[0]
+              ? { region, value: parsed[0].value }
+              : { region, value: 0 };
+          });
+      })
+    ).then((results) => {
+      console.log("consumeData:", results);
+      setConsumeData(results);
+    });
+  }, [selectedMonth]);
+
+  console.log("combined:", getCombinedValue("동명동"));
 
   return (
     <div className="Chart4">
