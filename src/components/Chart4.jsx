@@ -62,6 +62,10 @@ const Chart4 = () => {
     (d) => d.date === selectedDate && d.time === selectedTime,
   );
 
+  console.log("selectedDate:", selectedDate);
+  console.log("selectedTime:", selectedTime);
+  console.log("currentData:", currentData);
+
   // 행정동의 유동인구 값 가져오기
   const getValueByRegion = (region) => {
     const found = currentData.find((d) => d.region === region);
@@ -79,6 +83,24 @@ const Chart4 = () => {
     return "#FFEDA0";
   };
 
+  // 지도 데이터(GeoJSON)에 유동인구 값 추가
+  const mergedGeoData = {
+    ...filteredGeoData,
+    features: filteredGeoData.features.map((feature) => {
+      const dong = feature.properties.adm_nm.split(" ").pop();
+
+      const found = currentData.find((d) => d.region === dong);
+
+      return {
+        ...feature,
+        properties: {
+          ...feature.properties,
+          value: found ? found.value : 0,
+        },
+      };
+    }),
+  };
+
   // 지도 위에 글씨 쓰기
   const onEachFeature = (feature, layer) => {
     const dong = feature.properties.adm_nm.split(" ").pop();
@@ -88,8 +110,22 @@ const Chart4 = () => {
       direction: "center",
       className: "dong-label",
     });
-  };
 
+    layer.on("click", () => {
+      const value = feature.properties.value;
+
+      layer
+        .bindPopup(
+          `
+        <div>
+          <strong>${dong}</strong><br/>
+          유동인구: ${value}
+        </div>
+      `,
+        )
+        .openPopup();
+    });
+  };
   useEffect(() => {
     fetch("/data/flow/2025_flow_full.csv")
       .then((res) => res.text())
@@ -164,10 +200,10 @@ const Chart4 = () => {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           <GeoJSON
-            data={filteredGeoData}
+            key={selectedDate + selectedTime}
+            data={mergedGeoData}
             style={(feature) => {
-              const dong = feature.properties.adm_nm.split(" ").pop();
-              const value = getValueByRegion(dong);
+              const value = feature.properties.value;
 
               return {
                 color: "#333",
